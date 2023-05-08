@@ -13,6 +13,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.support.ListItemReader
 import org.springframework.batch.item.support.PassThroughItemProcessor
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -21,13 +22,16 @@ import org.springframework.context.annotation.Configuration
 class BatchConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val stepBuilderFactory: StepBuilderFactory,
-    private val mapUsingTasklet: MapUsingTasklet
+    private val mapUsingTasklet: MapUsingTasklet,
+    private val itemWriter1: MapItemWriter<String, Int>
 ) : DefaultBatchConfigurer() {
 
     @Bean
-    fun job(): Job {
+    fun job(
+        @Qualifier("step1") step1: Step
+    ): Job {
         return jobBuilderFactory.get("sampleJob")
-            .start(step1())
+            .start(step1)
             .next(step2())
             .build()
     }
@@ -38,7 +42,7 @@ class BatchConfiguration(
             .chunk<Int, Int>(2)
             .reader(itemReader1())
             .processor(PassThroughItemProcessor())
-            .writer(itemWriter1())
+            .writer(itemWriter1)
             .listener(itemReadListener1())
             .listener(itemWriteListener1())
             .build()

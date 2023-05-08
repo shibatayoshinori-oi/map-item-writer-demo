@@ -1,9 +1,11 @@
 package com.example.mapitemwriterdemo
 
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import javax.annotation.PostConstruct
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.support.ListItemWriter
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * [Map]に書き込む[ItemWriter]
@@ -22,7 +24,7 @@ open class MapItemWriter<K, V>(
     private val internalWrittenItems = ConcurrentHashMap<K, V>()
 
     /** 書き込まれた[Map] */
-    val writtenItems: Map<K, V> get() = internalWrittenItems.toMap()
+    open val writtenItems: Map<K, V> get() = internalWrittenItems.toMap()
 
     override fun write(items: List<V>) {
         items.forEach { internalWrittenItems[keySelector(it)] = it }
